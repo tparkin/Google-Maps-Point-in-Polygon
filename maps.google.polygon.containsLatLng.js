@@ -20,10 +20,25 @@ if (!google.maps.Polygon.prototype.getBounds) {
 // Polygon containsLatLng - method to determine if a latLng is within a polygon
 google.maps.Polygon.prototype.containsLatLng = function(latLng) {
   // Exclude points outside of bounds as there is no way they are in the poly
-  var bounds = this.getBounds();
+ 
+  var lat, lng;
 
-  if(bounds != null && !bounds.contains(latLng)) {
-    return false;
+  //arguments are a pair of lat, lng variables
+  if(arguments.length == 2) {
+    if(typeof arguments[0]=="number" && typeof arguments[1]=="number") {
+      lat = arguments[0];
+      lng = arguments[1];
+    }
+  } else if (arguments.length == 1) {
+    var bounds = this.getBounds();
+
+    if(bounds != null && !bounds.contains(latLng)) {
+      return false;
+    }
+    lat = latLng.lat();
+    lng = latLng.lng();
+  } else {
+    console.log("Wrong number of inputs in google.maps.Polygon.prototype.contains.LatLng");
   }
 
   // Raycast point in polygon method
@@ -39,8 +54,8 @@ google.maps.Polygon.prototype.containsLatLng = function(latLng) {
       var vertex1 = path.getAt(i);
       var vertex2 = path.getAt(j);
 
-      if (vertex1.lng() < latLng.lng() && vertex2.lng() >= latLng.lng() || vertex2.lng() < latLng.lng() && vertex1.lng() >= latLng.lng())  {
-        if (vertex1.lat() + (latLng.lng() - vertex1.lng()) / (vertex2.lng() - vertex1.lng()) * (vertex2.lat() - vertex1.lat()) < latLng.lat()) {
+      if (vertex1.lng() < lng && vertex2.lng() >= lng || vertex2.lng() < lng && vertex1.lng() >= lng) {
+        if (vertex1.lat() + (lng - vertex1.lng()) / (vertex2.lng() - vertex1.lng()) * (vertex2.lat() - vertex1.lat()) < lat) {
           inPoly = !inPoly;
         }
       }
